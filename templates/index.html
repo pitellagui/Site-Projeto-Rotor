@@ -237,7 +237,7 @@
             </div>
 
             <div class="resultado-bloco">
-              <h3>Saída inicial do rotor</h3>
+              <h3>Saída provisória do rotor</h3>
               <div class="resultado-linha">\(\Psi\) = <strong>{{ "%.4f"|format(resultados.Psi) }}</strong></div>
               <div class="resultado-linha">\(U_5\) = <strong>{{ "%.4f"|format(resultados.U5) }}</strong> <span>m/s</span></div>
               <div class="resultado-linha">\(R_5\) = <strong>{{ "%.4f"|format(resultados.R5) }}</strong> <span>m</span></div>
@@ -251,7 +251,7 @@
           <div class="resultado-coluna">
 
             <div class="resultado-bloco">
-              <h3>Entrada do rotor</h3>
+              <h3>Entrada provisória do rotor</h3>
               <div class="resultado-linha">\(\frac{R_4}{R_5}\) = <strong>{{ "%.4f"|format(resultados.relacao_R4_R5) }}</strong></div>
               <div class="resultado-linha">\(R_4\) = <strong>{{ "%.4f"|format(resultados.R4) }}</strong> <span>m</span></div>
               <div class="resultado-linha">\(V_{n,3}\) = <strong>{{ "%.4f"|format(resultados.V_n3) }}</strong> <span>m/s</span></div>
@@ -362,7 +362,7 @@
           </div>
 
           <div class="glossario-bloco">
-            <h3>Saída inicial do rotor</h3>
+            <h3>Saída provisória do rotor</h3>
             <div class="glossario-linha">\(\Psi\) = Coeficiente de pressão</div>
             <div class="glossario-linha">\(U_5\) = Velocidade tangencial de saída</div>
             <div class="glossario-linha">\(R_5\) = Raio de saída do rotor</div>
@@ -374,7 +374,7 @@
         <div class="glossario-coluna">
 
           <div class="glossario-bloco">
-            <h3>Entrada do rotor</h3>
+            <h3>Entrada provisória do rotor</h3>
             <div class="glossario-linha">\(\frac{R_4}{R_5}\) = Relação entre os raios</div>
             <div class="glossario-linha">\(R_4\) = Raio de entrada do rotor</div>
             <div class="glossario-linha">\(V_{n,3}\) = Velocidade normal na entrada</div>
@@ -519,23 +519,89 @@
             </div>
 
             <div class="sobre-calculo-bloco slide-sobre">
-              <h3>5.</h3>
+              <h3>5. Determinação da velocidade na boca de admissão e do diâmetro de admissão</h3>
+              <p>
+                O cálculo estimado da velocidade média na sucção ou admissão pode ser feito pela expressão:
+              </p>
+
+              \[
+              V_a = K_{V_a}\sqrt{2Y}
+              \]
+
+              <p>Em que:</p>
+
+              \[
+              K_{V_a} = 6{,}84 \times 10^{-3} N_s^{2/3}
+              \]
+
+              <p>
+                O diâmetro de admissão é calculado por:
+              </p>
+
+              \[
+              D_a = \sqrt{\frac{4\dot{V}}{\pi V_a \eta_v}} + d_c
+              \]
+
+              <p>
+                Em que \(d_c\) é o diâmetro do cubo, adotado por padrão como 20 mm maior que o diâmetro do eixo \(d_e\).
+              </p>
             </div>
 
             <div class="sobre-calculo-bloco slide-sobre">
-              <h3>6.</h3>
+              <h3>6. Ângulo e diâmetro provisório de saída do rotor</h3>
+
+              <p>
+                Para bombas centrífugas, o ângulo de saída \(\beta_5\) varia entre 20° e 30°.
+                Em geral, utilizam-se valores mais próximos ao limite superior, pois isso aumenta a altura de carga:
+                \(\beta_5 = 30^\circ\).
+              </p>
+
+              <p>
+                Inicialmente, estima-se o coeficiente de pressão \(\Psi\) pela expressão de Stepanoff:
+              </p>
+
+              \[
+              \Psi = 1{,}1424 + 0{,}0016 N_s
+              \]
+
+              <p>
+                Em seguida, são calculadas a velocidade tangencial de saída do rotor \(U_5\)
+                e o raio de saída \(R_5\):
+              </p>
+
+              \[
+              U_5 = \sqrt{\frac{2Y}{\Psi}} = \sqrt{\frac{2gH}{\Psi}}
+              \qquad\qquad
+              R_5 = \frac{U_5}{\omega}
+              \]
             </div>
 
             <div class="sobre-calculo-bloco slide-sobre">
-              <h3>7.</h3>
+              <h3>7. Cálculo do diâmetro de entrada e saída do rotor</h3>
+
+              <p>
+                A relação entre os diâmetros de entrada e saída pode ser calculada pela expressão de Tedeschi:
+              </p>
+
+              \[
+              \frac{D_4}{D_5} = 0{,}044\,N_s^{1/2}
+              \]
             </div>
 
             <div class="sobre-calculo-bloco slide-sobre">
-              <h3>8.</h3>
+              <h3>8. Cálculo da largura de entrada do rotor</h3>
+              <p> Para bombas a componente da velocidade absoluta na entrada do rotor deve ser 
+                ligeiramente superios que a velocidade de admissão para que a corrente entre no 
+                rotor ligeiramente acelerada: \(V_{n,3} = 1{,}03 \,V_a \)
+              </p>
+              \[b_4 = \frac{\dot{V}}{\eta_v \pi D_4 V_{n,3}} \]
             </div>
 
             <div class="sobre-calculo-bloco slide-sobre">
-              <h3>9.</h3>
+              <h3>9. .Cálculo provisório do ângulo de inclinação das pás na entrada do rotor</h3>
+              <p> Queremos que nossa bomba opere na maior potência possível, com entrada sem choque, ou seja:
+                \(\alpha_3 = \alpha_4 = 90^\circ\)
+              </p>
             </div>
 
             <div class="sobre-calculo-bloco slide-sobre">
