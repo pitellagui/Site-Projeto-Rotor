@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projeto Rotor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']]
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+</head>
+
+<body>
+
+  <header class="topo">
+    <div class="topo-conteudo">
+      <div class="logo">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Projeto Rotor">
+      </div>
+
+      <div>
+        <h1>Projeto Rotor</h1>
+        <p>Dimensionamento de um rotor radial</p>
+      </div>
+    </div>
+
+    <a href="#sobre-calculo" class="botao-info">Sobre o cálculo</a>
+  </header>
+
+  <main class="container">
+
+    <section class="card entrada">
+      <div class="titulo-card azul">
+        <h2>Dados de Entrada</h2>
+      </div>
+
+      <form method="POST">
+
+        <div class="campo">
+          <div class="icone">
+            <img src="{{ url_for('static', filename='img/vazao.png') }}" alt="Vazão">
+          </div>
+
+          <div class="campo-conteudo">
+            <label>Vazão volumétrica</label>
+
+            <div class="linha-input">
+              <input type="number" name="V_dot" value="{{ request.form.get('V_dot', '35') }}" step="any" required>
+
+              <select name="V_dot_unidade" required>
+                <option value="L/s" {% if request.form.get('V_dot_unidade', 'L/s') == 'L/s' %}selected{% endif %}>L/s</option>
+                <option value="L/min" {% if request.form.get('V_dot_unidade') == 'L/min' %}selected{% endif %}>L/min</option>
+                <option value="m3/s" {% if request.form.get('V_dot_unidade') == 'm3/s' %}selected{% endif %}>m³/s</option>
+                <option value="m3/h" {% if request.form.get('V_dot_unidade') == 'm3/h' %}selected{% endif %}>m³/h</option>
+                <option value="ft3/s" {% if request.form.get('V_dot_unidade') == 'ft3/s' %}selected{% endif %}>ft³/s</option>
+                <option value="ft3/min" {% if request.form.get('V_dot_unidade') == 'ft3/min' %}selected{% endif %}>ft³/min</option>
+                <option value="galUS/min" {% if request.form.get('V_dot_unidade') == 'galUS/min' %}selected{% endif %}>galUS/min</option>
+                <option value="bbl/d" {% if request.form.get('V_dot_unidade') == 'bbl/d' %}selected{% endif %}>bbl/d</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="campo">
+          <div class="icone">
+            <img src="{{ url_for('static', filename='img/altura.png') }}" alt="Altura">
+          </div>
+
+          <div class="campo-conteudo">
+            <label>Altura manométrica</label>
+
+            <div class="linha-input">
+              <input type="number" name="H" value="{{ request.form.get('H', '90') }}" step="any" required>
+
+              <select name="H_unidade" required>
+                <option value="m" {% if request.form.get('H_unidade', 'm') == 'm' %}selected{% endif %}>m</option>
+                <option value="cm" {% if request.form.get('H_unidade') == 'cm' %}selected{% endif %}>cm</option>
+                <option value="mm" {% if request.form.get('H_unidade') == 'mm' %}selected{% endif %}>mm</option>
+                <option value="ft" {% if request.form.get('H_unidade') == 'ft' %}selected{% endif %}>ft</option>
+                <option value="in" {% if request.form.get('H_unidade') == 'in' %}selected{% endif %}>in</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="campo">
+          <div class="icone">
+            <img src="{{ url_for('static', filename='img/rotacao.png') }}" alt="Rotação">
+          </div>
+
+          <div class="campo-conteudo">
+            <label>Rotação</label>
+
+            <div class="linha-input">
+              <input type="number" name="N" value="{{ request.form.get('N', '1750') }}" step="any" required>
+
+              <select name="N_unidade" required>
+                <option value="rpm" {% if request.form.get('N_unidade', 'rpm') == 'rpm' %}selected{% endif %}>rpm</option>
+                <option value="rev/s" {% if request.form.get('N_unidade') == 'rev/s' %}selected{% endif %}>rps</option>
+                <option value="rad/s" {% if request.form.get('N_unidade') == 'rad/s' %}selected{% endif %}>rad/s</option>
+                <option value="dega/s" {% if request.form.get('N_unidade') == 'dega/s' %}selected{% endif %}>graus/s</option>
+                <option value="dega/min" {% if request.form.get('N_unidade') == 'dega/min' %}selected{% endif %}>graus/min</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="campo">
+          <div class="icone">
+            <img src="{{ url_for('static', filename='img/tipoderotor.png') }}" alt="Tipo de rotor">
+          </div>
+
+          <div class="campo-conteudo">
+            <label>Tipo de rotor</label>
+
+            <select name="tipo_rotor" class="select-full" required>
+              <option value="fundido" {% if request.form.get('tipo_rotor', 'fundido') == 'fundido' %}selected{% endif %}>Fundido</option>
+              <option value="usinado" {% if request.form.get('tipo_rotor') == 'usinado' %}selected{% endif %}>Usinado</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="campo">
+          <div class="icone">
+            <img src="{{ url_for('static', filename='img/configuracaodorotor.png') }}" alt="Configuração do rotor">
+          </div>
+
+          <div class="campo-conteudo">
+            <label>Configuração do rotor</label>
+
+            <select name="configuracao_rotor" class="select-full" required>
+              <option value="aberto" {% if request.form.get('configuracao_rotor', 'aberto') == 'aberto' %}selected{% endif %}>Aberto</option>
+              <option value="fechado" {% if request.form.get('configuracao_rotor') == 'fechado' %}selected{% endif %}>Fechado</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="campo">
+          <div class="icone">
+            <img src="{{ url_for('static', filename='img/tipodedifusor.png') }}" alt="Tipo de difusor">
+          </div>
+
+          <div class="campo-conteudo">
+            <label>Tipo de difusor</label>
+
+            <select name="tipo_difusor" class="select-full" required>
+              <option value="voluta" {% if request.form.get('tipo_difusor', 'voluta') == 'voluta' %}selected{% endif %}>Com voluta</option>
+              <option value="pas_guias" {% if request.form.get('tipo_difusor') == 'pas_guias' %}selected{% endif %}>Com pás guias</option>
+              <option value="aberto" {% if request.form.get('tipo_difusor') == 'aberto' %}selected{% endif %}>Sem voluta</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="campo">
+          <div class="icone">
+            <img src="{{ url_for('static', filename='img/estagios.png') }}" alt="Estágios">
+          </div>
+
+          <div class="campo-conteudo">
+            <label>Estágios</label>
+
+            <select name="Estagios" class="select-full" required>
+              <option value="um" {% if request.form.get('Estagios', 'um') == 'um' %}selected{% endif %}>Um</option>
+              <option value="varios" {% if request.form.get('Estagios') == 'varios' %}selected{% endif %}>Vários</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="botao-calcular">Calcular</button>
+
+        {% if erro %}
+          <div class="erro">{{ erro }}</div>
+        {% endif %}
+
+      </form>
+    </section>
+
+    <section class="card resultados">
+      <div class="titulo-card azul">
+        <h2>Dimensionamento</h2>
+      </div>
+
+      {% if resultados %}
+
+        <div class="resultados-grade">
+
+          <div class="resultado-coluna">
+
+            <div class="resultado-bloco">
+              <h3>Resultados iniciais</h3>
+              <div class="resultado-linha">\(Y\) = <strong>{{ "%.4f"|format(resultados.Y) }}</strong> <span>J/kg</span></div>
+              <div class="resultado-linha">\(N_s\) = <strong>{{ "%.4f"|format(resultados.Ns) }}</strong></div>
+            </div>
+
+            <div class="resultado-bloco">
+              <h3>Classificações possíveis</h3>
+              <div class="classificacoes-lista">
+                {% for classificacao in resultados.classificacoes %}
+                  <p>- {{ classificacao }}</p>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="resultado-bloco">
+              <h3>Rendimentos</h3>
+              <div class="resultado-linha">\(\eta_h\) = <strong>{{ "%.4f"|format(resultados.eta_h) }}</strong></div>
+              <div class="resultado-linha">\(\eta_a\) = <strong>{{ "%.4f"|format(resultados.eta_a) }}</strong></div>
+              <div class="resultado-linha">\(\eta_m\) = <strong>{{ "%.4f"|format(resultados.eta_m) }}</strong></div>
+              <div class="resultado-linha">\(\eta_v\) = <strong>{{ "%.4f"|format(resultados.eta_v) }}</strong></div>
+              <div class="resultado-linha">\(\eta_t\) = <strong>{{ "%.4f"|format(resultados.eta_t) }}</strong></div>
+            </div>
+
+          </div>
+
+          <div class="resultado-coluna">
+
+            <div class="resultado-bloco">
+              <h3>Potência e eixo</h3>
+              <div class="resultado-linha">\(W_{acio}\) = <strong>{{ "%.4f"|format(resultados.W_acio_W) }}</strong> <span>W</span></div>
+              <div class="resultado-linha">\(W_{acio}\) = <strong>{{ "%.4f"|format(resultados.W_acio_kW) }}</strong> <span>kW</span></div>
+              <div class="resultado-linha">\(d_e\) = <strong>{{ "%.4f"|format(resultados.d_e_cm) }}</strong> <span>cm</span></div>
+            </div>
+
+            <div class="resultado-bloco">
+              <h3>Sucção</h3>
+              <div class="resultado-linha">\(K_{Va}\) = <strong>{{ "%.4f"|format(resultados.K_Va) }}</strong></div>
+              <div class="resultado-linha">\(V_a\) = <strong>{{ "%.4f"|format(resultados.Va) }}</strong> <span>m/s</span></div>
+              <div class="resultado-linha">\(d_c\) = <strong>{{ "%.4f"|format(resultados.d_c) }}</strong> <span>m</span></div>
+              <div class="resultado-linha">\(D_a\) = <strong>{{ "%.4f"|format(resultados.D_a) }}</strong> <span>m</span></div>
+            </div>
+
+            <div class="resultado-bloco">
+              <h3>Saída inicial do rotor</h3>
+              <div class="resultado-linha">\(\Psi\) = <strong>{{ "%.4f"|format(resultados.Psi) }}</strong></div>
+              <div class="resultado-linha">\(U_5\) = <strong>{{ "%.4f"|format(resultados.U5) }}</strong> <span>m/s</span></div>
+              <div class="resultado-linha">\(R_5\) = <strong>{{ "%.4f"|format(resultados.R5) }}</strong> <span>m</span></div>
+              <div class="resultado-linha">\(\beta_5\) = <strong>{{ "%.4f"|format(resultados.beta_5) }}</strong> <span>°</span></div>
+            </div>
+
+            <div class="resultado-bloco bloco-vazio" aria-hidden="true"></div>
+
+          </div>
+
+          <div class="resultado-coluna">
+
+            <div class="resultado-bloco">
+              <h3>Entrada do rotor</h3>
+              <div class="resultado-linha">\(\frac{R_4}{R_5}\) = <strong>{{ "%.4f"|format(resultados.relacao_R4_R5) }}</strong></div>
+              <div class="resultado-linha">\(R_4\) = <strong>{{ "%.4f"|format(resultados.R4) }}</strong> <span>m</span></div>
+              <div class="resultado-linha">\(V_{n,3}\) = <strong>{{ "%.4f"|format(resultados.V_n3) }}</strong> <span>m/s</span></div>
+              <div class="resultado-linha">\(b_4\) = <strong>{{ "%.4f"|format(resultados.b4_mm) }}</strong> <span>mm</span></div>
+              <div class="resultado-linha">\(f_{e4}\) = <strong>{{ "%.4f"|format(resultados.f_e4) }}</strong></div>
+              <div class="resultado-linha">\(V_4\) = <strong>{{ "%.4f"|format(resultados.V4) }}</strong> <span>m/s</span></div>
+              <div class="resultado-linha">\(U_4\) = <strong>{{ "%.4f"|format(resultados.U4) }}</strong> <span>m/s</span></div>
+              <div class="resultado-linha">\(\beta_4\) = <strong>{{ "%.4f"|format(resultados.beta4) }}</strong> <span>°</span></div>
+            </div>
+
+            <div class="resultado-bloco">
+              <h3>Pás e saída do rotor</h3>
+              <div class="resultado-linha">\(N_{pás}\) = <strong>{{ "%.4f"|format(resultados.N_pas) }}</strong></div>
+              <div class="resultado-linha">\(N_{pás,adotado}\) = <strong>{{ "%.4f"|format(resultados.N_pas_adotado) }}</strong></div>
+              <div class="resultado-linha">\(V_{n,5}\) = <strong>{{ "%.4f"|format(resultados.V_n5) }}</strong> <span>m/s</span></div>
+              <div class="resultado-linha">\(D_5\) = <strong>{{ "%.4f"|format(resultados.D5) }}</strong> <span>m</span></div>
+              <div class="resultado-linha">\(f_{e5}\) = <strong>{{ "%.4f"|format(resultados.f_e5) }}</strong></div>
+              <div class="resultado-linha">\(b_5\) = <strong>{{ "%.4f"|format(resultados.b5_mm) }}</strong> <span>mm</span></div>
+              <div class="resultado-linha">\(e\) = <strong>{{ "%.4f"|format(resultados.e_mm) }}</strong> <span>mm</span></div>
+            </div>
+
+          </div>
+
+          <div class="resultado-coluna">
+
+            <div class="resultado-bloco">
+              <h3>Atualização geométrica</h3>
+              <div class="resultado-linha">\(D_4\) = <strong>{{ "%.4f"|format(resultados.D4_mm) }}</strong> <span>mm</span></div>
+              <div class="resultado-linha">\(t_4\) = <strong>{{ "%.4f"|format(resultados.t4_mm) }}</strong> <span>mm</span></div>
+              <div class="resultado-linha">\(e_{t4}\) = <strong>{{ "%.4f"|format(resultados.e_t4_mm) }}</strong> <span>mm</span></div>
+              <div class="resultado-linha">\(f_{e4,atualizado}\) = <strong>{{ "%.4f"|format(resultados.f_e4_calculado) }}</strong></div>
+              <div class="resultado-linha">\(V_{4,atualizado}\) = <strong>{{ "%.4f"|format(resultados.V4_atualizado) }}</strong> <span>m/s</span></div>
+              <div class="resultado-linha">\(\beta_{4,atualizado}\) = <strong>{{ "%.4f"|format(resultados.beta4_atualizado) }}</strong> <span>°</span></div>
+            </div>
+
+            <div class="resultado-bloco">
+              <h3>Correções finais</h3>
+              <div class="resultado-linha">\(Y_{pá}\) = <strong>{{ "%.4f"|format(resultados.Y_pa) }}</strong> <span>J/kg</span></div>
+              <div class="resultado-linha">\(\mu\) = <strong>{{ "%.4f"|format(resultados.mu) }}</strong></div>
+              <div class="resultado-linha">\(Y_{pá,\infty}\) = <strong>{{ "%.4f"|format(resultados.Y_pa_inf) }}</strong> <span>J/kg</span></div>
+              <div class="resultado-linha">\(U_{5,atualizado}\) = <strong>{{ "%.4f"|format(resultados.U5_atualizado) }}</strong> <span>m/s</span></div>
+              <div class="resultado-linha">\(R_{5,atualizado}\) = <strong>{{ "%.4f"|format(resultados.R5_atualizado) }}</strong> <span>m</span></div>
+              <div class="resultado-linha">\(D_{5,atualizado}\) = <strong>{{ "%.4f"|format(resultados.D5_atualizado) }}</strong> <span>m</span></div>
+              <div class="resultado-linha">\(b_{5,atualizado}\) = <strong>{{ "%.4f"|format(resultados.b5_atualizado_mm) }}</strong> <span>mm</span></div>
+              <div class="resultado-linha">\(V_{t,5}\) = <strong>{{ "%.4f"|format(resultados.V_t5) }}</strong> <span>m/s</span></div>
+              <div class="resultado-linha">\(U_6\) = <strong>{{ "%.4f"|format(resultados.U6) }}</strong> <span>m/s</span></div>
+              <div class="resultado-linha">\(V_{t,6}\) = <strong>{{ "%.4f"|format(resultados.V_t6) }}</strong> <span>m/s</span></div>
+            </div>
+
+          </div>
+
+        </div>
+
+      {% else %}
+        <div class="area-resultados-vazia">
+          <p>Os resultados aparecerão aqui após o cálculo.</p>
+        </div>
+      {% endif %}
+    </section>
+
+    <section class="card glossario">
+      <div class="titulo-card azul">
+        <h2>Glossário de Variáveis</h2>
+      </div>
+
+      <div class="glossario-grade">
+
+        <div class="glossario-coluna">
+
+          <div class="glossario-bloco">
+            <h3>Dados de entrada</h3>
+            <div class="glossario-linha">\(\dot{V}\) = Vazão volumétrica</div>
+            <div class="glossario-linha">\(H\) = Altura manométrica</div>
+            <div class="glossario-linha">\(N\) = Rotação</div>
+          </div>
+
+          <div class="glossario-bloco">
+            <h3>Grandezas iniciais</h3>
+            <div class="glossario-linha">\(Y\) = Altura de carga específica</div>
+            <div class="glossario-linha">\(N_s\) = Número específico</div>
+          </div>
+
+          <div class="glossario-bloco">
+            <h3>Rendimentos</h3>
+            <div class="glossario-linha">\(\eta_h\) = Rendimento hidráulico</div>
+            <div class="glossario-linha">\(\eta_a\) = Rendimento por atrito nos discos</div>
+            <div class="glossario-linha">\(\eta_m\) = Rendimento mecânico</div>
+            <div class="glossario-linha">\(\eta_v\) = Rendimento volumétrico</div>
+            <div class="glossario-linha">\(\eta_t\) = Rendimento total</div>
+          </div>
+
+        </div>
+
+        <div class="glossario-coluna">
+
+          <div class="glossario-bloco">
+            <h3>Potência e eixo</h3>
+            <div class="glossario-linha">\(W_{acio}\) = Potência de acionamento</div>
+            <div class="glossario-linha">\(d_e\) = Diâmetro do eixo</div>
+          </div>
+
+          <div class="glossario-bloco">
+            <h3>Sucção</h3>
+            <div class="glossario-linha">\(K_{Va}\) = Coeficiente de velocidade na sucção</div>
+            <div class="glossario-linha">\(V_a\) = Velocidade média na sucção</div>
+            <div class="glossario-linha">\(d_c\) = Diâmetro do cubo</div>
+            <div class="glossario-linha">\(D_a\) = Diâmetro na sucção</div>
+          </div>
+
+          <div class="glossario-bloco">
+            <h3>Saída inicial do rotor</h3>
+            <div class="glossario-linha">\(\Psi\) = Coeficiente de pressão</div>
+            <div class="glossario-linha">\(U_5\) = Velocidade tangencial de saída</div>
+            <div class="glossario-linha">\(R_5\) = Raio de saída do rotor</div>
+            <div class="glossario-linha">\(\beta_5\) = Ângulo de saída</div>
+          </div>
+
+        </div>
+
+        <div class="glossario-coluna">
+
+          <div class="glossario-bloco">
+            <h3>Entrada do rotor</h3>
+            <div class="glossario-linha">\(\frac{R_4}{R_5}\) = Relação entre os raios</div>
+            <div class="glossario-linha">\(R_4\) = Raio de entrada do rotor</div>
+            <div class="glossario-linha">\(V_{n,3}\) = Velocidade normal na entrada</div>
+            <div class="glossario-linha">\(b_4\) = Largura de entrada do rotor</div>
+            <div class="glossario-linha">\(f_{e4}\) = Fator de estrangulamento na entrada</div>
+            <div class="glossario-linha">\(V_4\) = Velocidade na entrada</div>
+            <div class="glossario-linha">\(U_4\) = Velocidade tangencial na entrada</div>
+            <div class="glossario-linha">\(\beta_4\) = Ângulo de entrada</div>
+          </div>
+
+          <div class="glossario-bloco">
+            <h3>Pás e saída do rotor</h3>
+            <div class="glossario-linha">\(N_{pás}\) = Número de pás calculado</div>
+            <div class="glossario-linha">\(N_{pás,adotado}\) = Número de pás adotado</div>
+            <div class="glossario-linha">\(V_{n,5}\) = Velocidade normal de saída</div>
+            <div class="glossario-linha">\(D_5\) = Diâmetro de saída do rotor</div>
+            <div class="glossario-linha">\(f_{e5}\) = Fator de estrangulamento provisório</div>
+            <div class="glossario-linha">\(b_5\) = Largura de saída do rotor</div>
+            <div class="glossario-linha">\(e\) = Espessura da pá</div>
+          </div>
+
+        </div>
+
+        <div class="glossario-coluna">
+
+          <div class="glossario-bloco">
+            <h3>Atualização geométrica</h3>
+            <div class="glossario-linha">\(D_4\) = Diâmetro de entrada do rotor</div>
+            <div class="glossario-linha">\(t_4\) = Passo das pás na entrada</div>
+            <div class="glossario-linha">\(e_{t4}\) = Espessura tangencial na entrada</div>
+            <div class="glossario-linha">\(f_{e4,atualizado}\) = Fator de estrangulamento atualizado</div>
+            <div class="glossario-linha">\(V_{4,atualizado}\) = Velocidade atualizada</div>
+            <div class="glossario-linha">\(\beta_{4,atualizado}\) = Ângulo atualizado</div>
+          </div>
+
+          <div class="glossario-bloco">
+            <h3>Correções finais</h3>
+            <div class="glossario-linha">\(Y_{pá}\) = Carga específica com número finito de pás</div>
+            <div class="glossario-linha">\(\mu\) = Fator de deficiência de potência</div>
+            <div class="glossario-linha">\(Y_{pá,\infty}\) = Carga específica com número infinito de pás</div>
+            <div class="glossario-linha">\(U_{5,atualizado}\) = Velocidade tangencial de saída atualizada</div>
+            <div class="glossario-linha">\(R_{5,atualizado}\) = Raio de saída atualizado</div>
+            <div class="glossario-linha">\(D_{5,atualizado}\) = Diâmetro de saída atualizado</div>
+            <div class="glossario-linha">\(b_{5,atualizado}\) = Largura de saída atualizada</div>
+            <div class="glossario-linha">\(V_{t,5}\) = Componente tangencial na saída das pás</div>
+            <div class="glossario-linha">\(U_6\) = Velocidade após a saída do rotor</div>
+            <div class="glossario-linha">\(V_{t,6}\) = Componente tangencial após o rotor</div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <section id="sobre-calculo" class="card sobre-calculo">
+      <div class="titulo-card azul">
+        <h2>Sobre o cálculo</h2>
+      </div>
+
+      <div class="carrossel-sobre">
+
+        <button class="seta-carrossel seta-esquerda" type="button" aria-label="Etapa anterior">
+          &#10094;
+        </button>
+
+        <div class="carrossel-viewport">
+          <div class="carrossel-trilha">
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>1. Aquisição dos dados de entrada</h3>
+              <p>Para os cálculos, são necessários os seguintes dados de entrada:</p>
+              <p>
+                - Vazão volumétrica \((\dot{V})\)<br>
+                - Altura manométrica \((H)\)<br>
+                - Rotação \((N)\)<br>
+                - \(Y = H \cdot g\)
+              </p>
+            </div>
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>2. Definição do tipo</h3>
+              <p>A definição do tipo de rotor é feita pelo cálculo da velocidade específica.</p>
+
+              \[
+              N_s = 10^3 \omega \frac{\dot{V}^{1/2}}{Y^{3/4}}
+              \quad
+              \left\{
+              \begin{array}{l}
+              \dot{V} \; [m^3/s] \\
+              Y \; [J/kg] \\
+              \omega \; [RPS]
+              \end{array}
+              \right.
+              \]
+            </div>
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>3. Estimativa da potência de acionamento necessária</h3>
+              <p>
+                Para estimar a potência de acionamento, são utilizados valores de rendimento
+                como referência, baseados no \(N_s\) e no tipo de rotor.
+              </p>
+
+              \[
+              \dot{W}_{acio}
+              =
+              \frac{\dot{W}_m}{\eta_t}
+              =
+              \frac{\rho \dot{V}Y}{\eta_t}
+              \]
+
+              \[
+              \eta_t = \eta_h \eta_v \eta_a \eta_m
+              \]
+            </div>
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>4. Estimativa do diâmetro do eixo</h3>
+              <p>
+                Antes de dimensionar as pás, estima-se o diâmetro do eixo do rotor.
+                Esse cálculo depende da tensão admissível de cisalhamento e do número de estágios.
+              </p>
+
+              \[
+              d_e = K_e \sqrt[3]{\frac{\dot{W}_{acio}}{\omega}}
+              \quad
+              \left\{
+              \begin{array}{l}
+              \dot{W}_{acio} \; [kW] \\
+              d_e \; [cm] \\
+              \omega \; [RPM] \\
+              K_e \; [-]
+              \end{array}
+              \right.
+              \]
+
+              <p>
+                Considerando eixo de aço carbono SAE 1050 ou SAE 1050:<br>
+                \(K_e = 14\) para bombas de um estágio<br>
+                \(K_e = 16\) para bombas de vários estágios
+              </p>
+            </div>
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>5.</h3>
+            </div>
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>6.</h3>
+            </div>
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>7.</h3>
+            </div>
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>8.</h3>
+            </div>
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>9.</h3>
+            </div>
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>10.</h3>
+            </div>
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>11.</h3>
+            </div>
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>12.</h3>
+            </div>
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>13.</h3>
+            </div>
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>14.</h3>
+            </div>
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>15.</h3>
+            </div>
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>16.</h3>
+            </div>
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>17.</h3>
+            </div>
+
+            <div class="sobre-calculo-bloco slide-sobre">
+              <h3>18.</h3>
+            </div>
+
+          </div>
+        </div>
+
+        <button class="seta-carrossel seta-direita" type="button" aria-label="Próxima etapa">
+          &#10095;
+        </button>
+
+      </div>
+
+      <div class="indicadores-carrossel"></div>
+    </section>
+
+  </main>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
