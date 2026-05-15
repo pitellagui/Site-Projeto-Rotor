@@ -448,6 +448,7 @@ select:focus {
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 18px;
+  min-width: 0;
 }
 
 .slide-sobre h3 {
@@ -462,6 +463,36 @@ select:focus {
   font-size: 15px;
   line-height: 1.55;
   color: #1e293b;
+}
+
+/* FÓRMULAS DO SOBRE O CÁLCULO */
+
+.slide-sobre mjx-container {
+  max-width: 100%;
+}
+
+.slide-sobre mjx-container[display="true"] {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 4px;
+  margin: 10px 0 !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.slide-sobre mjx-container[display="true"]::-webkit-scrollbar {
+  height: 5px;
+}
+
+.slide-sobre mjx-container[display="true"]::-webkit-scrollbar-track {
+  background: #e2e8f0;
+  border-radius: 999px;
+}
+
+.slide-sobre mjx-container[display="true"]::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 999px;
 }
 
 .seta-carrossel {
@@ -664,11 +695,25 @@ select:focus {
     font-size: 14px;
   }
 
+  .slide-sobre {
+    padding: 14px;
+  }
+
   .slide-sobre h3 {
     font-size: 17px;
   }
 
   .slide-sobre p {
     font-size: 14px;
+    overflow-wrap: anywhere;
+  }
+
+  .slide-sobre mjx-container {
+    font-size: 82% !important;
+  }
+
+  .slide-sobre mjx-container[display="true"] {
+    margin: 8px 0 !important;
+    padding-bottom: 6px;
   }
 }
