@@ -568,19 +568,45 @@ select:focus {
 
 @media (max-width: 800px) {
   .carrossel-sobre {
-    gap: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "banner banner"
+      "anterior proximo";
+    align-items: center;
+    justify-items: center;
+    gap: 14px 16px;
+    width: 100%;
+  }
+
+  .carrossel-viewport {
+    grid-area: banner;
+    width: 100%;
+    overflow: hidden;
   }
 
   .slide-sobre {
     flex: 0 0 100%;
+    width: 100%;
+    min-width: 100%;
     min-height: auto;
   }
 
+  .carrossel-sobre > .seta-carrossel:first-child {
+    grid-area: anterior;
+    justify-self: end;
+  }
+
+  .carrossel-sobre > .seta-carrossel:last-child {
+    grid-area: proximo;
+    justify-self: start;
+  }
+
   .seta-carrossel {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    font-size: 20px;
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    font-size: 21px;
   }
 }
 
